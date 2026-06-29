@@ -85,7 +85,12 @@ def make_driver() -> webdriver.Chrome:
     chrome_options.add_argument("--remote-debugging-port=9222")
     chrome_options.add_argument("--single-process")
     chrome_options.add_argument("--no-zygote")
-    chrome_options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
+    chrome_options.add_argument(
+        "--user-agent=Mozilla/5.0 (X11; Linux x86_64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/124.0.0.0 Safari/537.36"
+    )
+
     chrome_bin = os.getenv("CHROME_BIN", "/usr/bin/chromium")
     chromedriver_bin = os.getenv("CHROMEDRIVER_BIN", "/usr/bin/chromedriver")
 
@@ -128,34 +133,37 @@ def save_page_screenshot(driver, prefix: str) -> Path:
     path = SCREENSHOT_DIR / f"{prefix}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
     driver.save_screenshot(str(path))
     return path
-    
+
+
 def check_once(bot: Telegram) -> bool:
     driver = make_driver()
 
-    print(f"[{now_text()}] Opening site...", flush=True)
-
     try:
-        driver.get(URL)
-    except TimeoutException:
-        print(f"[{now_text()}] Page load timeout, stopping page load...", flush=True)
-        driver.execute_script("window.stop();")
+        print(f"[{now_text()}] Opening site...", flush=True)
 
-    for attempt in range(3):
         try:
-            select_by_text_contains(driver, (By.NAME, "form"), PROVINCE, timeout=30)
-            break
+            driver.get(URL)
         except TimeoutException:
-            print(f"[{now_text()}] Province form not found, retry {attempt + 1}/3...", flush=True)
-            driver.refresh()
-            sleep_random(5, 8)
-    else:
-        screenshot = save_page_screenshot(driver, "first_page_timeout")
-        
-    screenshot = save_page_screenshot(driver, "first_page_timeout")
-    bot.send_message("⚠️ Сайт открылся, но форма выбора провинции не загрузилась. Отправляю скрин.")
-    bot.send_photo(screenshot, "Первая страница не загрузила форму")
-    print(f"[{now_text()}] Province form not found.", flush=True)
-    return False
+            print(f"[{now_text()}] Page load timeout, stopping page load...", flush=True)
+            driver.execute_script("window.stop();")
+
+        for attempt in range(3):
+            try:
+                select_by_text_contains(driver, (By.NAME, "form"), PROVINCE, timeout=30)
+                break
+            except TimeoutException:
+                print(
+                    f"[{now_text()}] Province form not found, retry {attempt + 1}/3...",
+                    flush=True,
+                )
+                driver.refresh()
+                sleep_random(5, 8)
+        else:
+            screenshot = save_page_screenshot(driver, "first_page_timeout")
+            bot.send_message("⚠️ Сайт открылся, но форма выбора провинции не загрузилась. Отправляю скрин.")
+            bot.send_photo(screenshot, "Первая страница не загрузила форму")
+            print(f"[{now_text()}] Province form not found.", flush=True)
+            return False
 
         sleep_random()
         click_when_ready(driver, (By.ID, "btnAceptar"))
@@ -207,6 +215,7 @@ def check_once(bot: Telegram) -> bool:
 
     finally:
         driver.quit()
+
 
 def main() -> None:
     bot = Telegram(TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID)
