@@ -186,8 +186,8 @@ for attempt in range(3):
         )
         driver.refresh()
         sleep_random(8, 5)
-        sleep_random(8, 5)
-else:
+        
+    else:
     screenshot = save_page_screenshot(driver, "first_page_timeout")
     bot.send_message("⚠️ Сайт открылся, но форма выбора провинции не загрузилась. Отправляю скрин.")
     bot.send_photo(screenshot, "Первая страница не загрузила форму")
@@ -212,16 +212,17 @@ send_keys_when_ready(driver, (By.NAME, "txtIdCitado"), NIE)
 sleep_random(1, 2)
 
 send_keys_when_ready(driver, (By.NAME, "txtDesCitado"), FULL_NAME)
+sleep_random()
 
+driver.execute_script("envia()")
 
-        driver.execute_script("envia()")
+sleep_random()
+driver.execute_script("enviar('solicitud')")
 
-        sleep_random()
-        driver.execute_script("enviar('solicitud')")
-        sleep_random(4, 4)
+sleep_random(4, 4)
 
-        page_text = driver.find_element(By.TAG_NAME, "body").text
-        screenshot = save_page_screenshot(driver, "check")
+page_text = driver.find_element(By.TAG_NAME, "body").text
+screenshot = save_page_screenshot(driver, "check")
 
         no_slots_phrases = [
             "En este momento no hay citas disponibles",
