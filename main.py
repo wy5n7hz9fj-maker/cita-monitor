@@ -202,9 +202,6 @@ def check_once(bot: Telegram) -> bool:
     finally:
         driver.quit()
 
-    finally:
-        driver.quit()
-
 def main() -> None:
     bot = Telegram(TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID)
     bot.send_message("✅ Cita monitor iniciado en Railway.")
