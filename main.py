@@ -26,7 +26,7 @@ from config import (
     TELEGRAM_CHAT_ID,
 )
 
-URL = "https://icp.administracionelectronica.gob.es/icpco/index"
+URL = "https://icp.administracionelectronica.gob.es/icpplus/index.html"
 
 SCREENSHOT_DIR = Path("screenshots")
 SCREENSHOT_DIR.mkdir(exist_ok=True)
