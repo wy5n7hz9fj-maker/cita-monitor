@@ -69,18 +69,20 @@ def sleep_random(base_seconds: int = 2, extra_seconds: int = 3) -> None:
 
 def make_driver() -> webdriver.Chrome:
     chrome_options = Options()
+
     if HEADLESS:
         chrome_options.add_argument("--headless=new")
 
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--window-size=1440,1200")
+    chrome_options.add_argument("--disable-software-rasterizer")
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--disable-background-networking")
+    chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-    chrome_options.add_argument(
-        "--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-    )
+    chrome_options.add_argument("--remote-debugging-port=9222")
+    chrome_options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
 
     chrome_bin = os.getenv("CHROME_BIN", "/usr/bin/chromium")
     chromedriver_bin = os.getenv("CHROMEDRIVER_BIN", "/usr/bin/chromedriver")
@@ -89,7 +91,10 @@ def make_driver() -> webdriver.Chrome:
         chrome_options.binary_location = chrome_bin
 
     service = Service(chromedriver_bin)
-    return webdriver.Chrome(service=service, options=chrome_options)
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver.set_page_load_timeout(90)
+    driver.set_script_timeout(90)
+    return driver
 
 
 def select_by_text_contains(driver, locator: tuple[str, str], expected_text: str, timeout: int = 25) -> None:
