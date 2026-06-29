@@ -135,7 +135,7 @@ def check_once(bot: Telegram) -> bool:
 
     print(f"[{now_text()}] Opening site...", flush=True)
 
-        try:
+    try:
             driver.get(URL)
         except TimeoutException:
             print(f"[{now_text()}] Page load timeout, stopping page load...", flush=True)
