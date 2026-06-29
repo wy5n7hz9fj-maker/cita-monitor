@@ -27,42 +27,54 @@ from config import (
 )
 
 URL = "https://icp.administracionelectronica.gob.es/icpco/index"
+
 SCREENSHOT_DIR = Path("screenshots")
 SCREENSHOT_DIR.mkdir(exist_ok=True)
-
-
 class Telegram:
+
     def __init__(self, token: str, chat_id: str):
         self.base_url = f"https://api.telegram.org/bot{token}"
         self.chat_id = chat_id
 
-   def send_message(self, text: str) -> None:
-    try:
-        response = requests.post(
-            f"{self.base_url}/sendMessage",
-            data={
-                "chat_id": self.chat_id,
-                "text": text,
-            },
-            timeout=20,
-        )
-      print(f"Telegram sendMessage status: {response.status_code}", flush=True) 
-        )
-    except Exception as exc:
-        print(f"Telegram message error: {exc}", flush=True) 
+    def send_message(self, text: str) -> None:
+        try:
+            response = requests.post(
+                f"{self.base_url}/sendMessage",
+                data={
+                    "chat_id": self.chat_id,
+                    "text": text,
+                },
+                timeout=20,
+            )
+            print(
+                f"Telegram sendMessage status: {response.status_code} {response.text}",
+                flush=True,
+            )
+        except Exception as exc:
+            print(f"Telegram message error: {exc}", flush=True)
 
     def send_photo(self, path: Path, caption: str = "") -> None:
-    try:
-        with path.open("rb") as photo:
-            response = requests.post(
-                f"{self.base_url}/sendPhoto",
-                data={"chat_id": self.chat_id, "caption": caption},
-                files={"photo": photo},
-                timeout=30,
+        try:
+            with path.open("rb") as photo:
+                response = requests.post(
+                    f"{self.base_url}/sendPhoto",
+                    data={
+                        "chat_id": self.chat_id,
+                        "caption": caption,
+                    },
+                    files={
+                        "photo": photo,
+                    },
+                    timeout=30,
+                )
+            print(
+                f"Telegram sendPhoto status: {response.status_code} {response.text}",
+                flush=True,
             )
-print(f"Telegram sendPhoto status: {response.status_code}", flush=True)
-except Exception as exc:
-        print(f"Telegram photo error: {exc}", flush=True)
+        except Exception as exc:
+            print(f"Telegram photo error: {exc}", flush=True)
+
+
 def now_text() -> str:
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -83,7 +95,6 @@ def make_driver() -> webdriver.Chrome:
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--disable-extensions")
     chrome_options.add_argument("--disable-background-networking")
-    chrome_options.add_argument("--disable-features=RendererCodeIntegrity")
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     chrome_options.add_argument("--remote-debugging-port=9222")
@@ -108,8 +119,10 @@ def make_driver() -> webdriver.Chrome:
     return driver
 
 
-def select_by_text_contains(driver, locator: tuple[str, str], expected_text: str, timeout: int = 25) -> None:
-    element = WebDriverWait(driver, timeout).until(EC.presence_of_element_located(locator))
+def select_by_text_contains(driver, locator, expected_text: str, timeout: int = 25) -> None:
+    element = WebDriverWait(driver, timeout).until(
+        EC.presence_of_element_located(locator)
+    )
     select = Select(element)
     expected_norm = expected_text.strip().lower()
 
@@ -120,15 +133,21 @@ def select_by_text_contains(driver, locator: tuple[str, str], expected_text: str
             return
 
     available = [option.text.strip() for option in select.options if option.text.strip()]
-    raise RuntimeError(f"Option not found: {expected_text}. Available options: {available[:20]}")
+    raise RuntimeError(
+        f"Option not found: {expected_text}. Available options: {available[:20]}"
+    )
 
 
-def click_when_ready(driver, locator: tuple[str, str], timeout: int = 25) -> None:
-    WebDriverWait(driver, timeout).until(EC.element_to_be_clickable(locator)).click()
+def click_when_ready(driver, locator, timeout: int = 25) -> None:
+    WebDriverWait(driver, timeout).until(
+        EC.element_to_be_clickable(locator)
+    ).click()
 
 
-def send_keys_when_ready(driver, locator: tuple[str, str], value: str, timeout: int = 25) -> None:
-    element = WebDriverWait(driver, timeout).until(EC.presence_of_element_located(locator))
+def send_keys_when_ready(driver, locator, value: str, timeout: int = 25) -> None:
+    element = WebDriverWait(driver, timeout).until(
+        EC.presence_of_element_located(locator)
+    )
     element.clear()
     element.send_keys(value)
 
@@ -153,7 +172,12 @@ def check_once(bot: Telegram) -> bool:
 
         for attempt in range(3):
             try:
-                select_by_text_contains(driver, (By.NAME, "form"), PROVINCE, timeout=30)
+                select_by_text_contains(
+                    driver,
+                    (By.NAME, "form"),
+                    PROVINCE,
+                    timeout=30,
+                )
                 break
             except TimeoutException:
                 print(
@@ -161,10 +185,12 @@ def check_once(bot: Telegram) -> bool:
                     flush=True,
                 )
                 driver.refresh()
-                sleep_random(5, 8)
+                sleep_random(8, 5)
         else:
             screenshot = save_page_screenshot(driver, "first_page_timeout")
-            bot.send_message("⚠️ Сайт открылся, но форма выбора провинции не загрузилась. Отправляю скрин.")
+            bot.send_message(
+                "⚠️ Сайт открылся, но форма выбора провинции не загрузилась. Отправляю скрин."
+            )
             bot.send_photo(screenshot, "Первая страница не загрузила форму")
             print(f"[{now_text()}] Province form not found.", flush=True)
             return False
@@ -174,8 +200,10 @@ def check_once(bot: Telegram) -> bool:
 
         select_by_text_contains(driver, (By.NAME, "sede"), OFFICE)
         sleep_random(1, 2)
+
         select_by_text_contains(driver, (By.NAME, "tramiteGrupo[0]"), PROCEDURE)
         sleep_random()
+
         driver.execute_script("envia()")
 
         sleep_random()
@@ -183,8 +211,10 @@ def check_once(bot: Telegram) -> bool:
 
         send_keys_when_ready(driver, (By.NAME, "txtIdCitado"), NIE)
         sleep_random(1, 2)
+
         send_keys_when_ready(driver, (By.NAME, "txtDesCitado"), FULL_NAME)
         sleep_random()
+
         driver.execute_script("envia()")
 
         sleep_random()
@@ -212,6 +242,7 @@ def check_once(bot: Telegram) -> bool:
             f"Hora: {now_text()}\n\n"
             "Revisa la web inmediatamente. Te envío captura."
         )
+
         bot.send_message(message)
         bot.send_photo(screenshot, "Captura de la posible cita")
         print(f"[{now_text()}] Possible appointment found!", flush=True)
@@ -223,15 +254,18 @@ def check_once(bot: Telegram) -> bool:
 
 def main() -> None:
     bot = Telegram(TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID)
+
     bot.send_message("✅ Cita monitor iniciado en Railway.")
     bot.send_message("🟢 TEST: Telegram подключён.")
-    print(f"[{now_text()}] Monitor started.", flush=True)   
+
+    print(f"[{now_text()}] Monitor started.", flush=True)
 
     next_heartbeat = datetime.now() + timedelta(hours=HEARTBEAT_EVERY_HOURS)
 
     while True:
         try:
             found = check_once(bot)
+
             if found:
                 time.sleep(300)
 
@@ -241,8 +275,10 @@ def main() -> None:
 
         except TimeoutException as exc:
             print(f"[{now_text()}] Timeout error: {exc}", flush=True)
+
         except WebDriverException as exc:
             print(f"[{now_text()}] WebDriver error: {exc}", flush=True)
+
         except Exception as exc:
             print(f"[{now_text()}] Unexpected error: {exc}", flush=True)
             bot.send_message(f"⚠️ Ошибка монитора: {exc}")
