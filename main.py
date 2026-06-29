@@ -85,6 +85,7 @@ def make_driver() -> webdriver.Chrome:
     chrome_options.add_argument("--single-process")
     chrome_options.add_argument("--no-zygote")
     chrome_options.add_argument("--user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
+    chrome_bin = os.getenv("CHROME_BIN", "/usr/bin/chromium")
     chromedriver_bin = os.getenv("CHROMEDRIVER_BIN", "/usr/bin/chromedriver")
 
     if Path(chrome_bin).exists():
