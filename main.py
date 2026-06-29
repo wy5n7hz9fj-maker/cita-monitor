@@ -36,29 +36,33 @@ class Telegram:
         self.base_url = f"https://api.telegram.org/bot{token}"
         self.chat_id = chat_id
 
-    def send_message(self, text: str) -> None:
-        try:
-            requests.post(
-                f"{self.base_url}/sendMessage",
-                data={"chat_id": self.chat_id, "text": text},
-                timeout=20,
-            )
-        except Exception as exc:
-            print(f"Telegram message error: {exc}", flush=True)
+   def send_message(self, text: str) -> None:
+    try:
+        response = requests.post(
+            f"{self.base_url}/sendMessage",
+            data={
+                "chat_id": self.chat_id,
+                "text": text,
+            },
+            timeout=20,
+        )
+      print(f"Telegram sendMessage status: {response.status_code}", flush=True) 
+        )
+    except Exception as exc:
+        print(f"Telegram message error: {exc}", flush=True) 
 
     def send_photo(self, path: Path, caption: str = "") -> None:
-        try:
-            with path.open("rb") as photo:
-                requests.post(
-                    f"{self.base_url}/sendPhoto",
-                    data={"chat_id": self.chat_id, "caption": caption},
-                    files={"photo": photo},
-                    timeout=30,
-                )
-        except Exception as exc:
-            print(f"Telegram photo error: {exc}", flush=True)
-
-
+    try:
+        with path.open("rb") as photo:
+            response = requests.post(
+                f"{self.base_url}/sendPhoto",
+                data={"chat_id": self.chat_id, "caption": caption},
+                files={"photo": photo},
+                timeout=30,
+            )
+print(f"Telegram sendPhoto status: {response.status_code}", flush=True)
+except Exception as exc:
+        print(f"Telegram photo error: {exc}", flush=True)
 def now_text() -> str:
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
