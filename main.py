@@ -188,11 +188,11 @@ for attempt in range(3):
         sleep_random(8, 5)
         
     else:
-    screenshot = save_page_screenshot(driver, "first_page_timeout")
-    bot.send_message("⚠️ Сайт открылся, но форма выбора провинции не загрузилась. Отправляю скрин.")
-    bot.send_photo(screenshot, "Первая страница не загрузила форму")
-    print(f"[{now_text()}] Province form not found.", flush=True)
-    return False
+        screenshot = save_page_screenshot(driver, "first_page_timeout")
+        bot.send_message("⚠️ Сайт открылся, но форма выбора провинции не загрузилась. Отправляю скрин.")
+        bot.send_photo(screenshot, "Первая страница не загрузила форму")
+        print(f"[{now_text()}] Province form not found.", flush=True)
+        return False
 
 sleep_random()
 click_when_ready(driver, (By.ID, "btnAceptar"))
