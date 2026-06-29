@@ -186,31 +186,33 @@ for attempt in range(3):
         )
         driver.refresh()
         sleep_random(8, 5)
+        sleep_random(8, 5)
 else:
     screenshot = save_page_screenshot(driver, "first_page_timeout")
     bot.send_message("⚠️ Сайт открылся, но форма выбора провинции не загрузилась. Отправляю скрин.")
     bot.send_photo(screenshot, "Первая страница не загрузила форму")
     print(f"[{now_text()}] Province form not found.", flush=True)
     return False
+
 sleep_random()
 click_when_ready(driver, (By.ID, "btnAceptar"))
 
-        select_by_text_contains(driver, (By.NAME, "sede"), OFFICE)
-        sleep_random(1, 2)
+select_by_text_contains(driver, (By.NAME, "sede"), OFFICE)
+sleep_random(1, 2)
 
-        select_by_text_contains(driver, (By.NAME, "tramiteGrupo[0]"), PROCEDURE)
-        sleep_random()
+select_by_text_contains(driver, (By.NAME, "tramiteGrupo[0]"), PROCEDURE)
+sleep_random()
 
-        driver.execute_script("envia()")
+driver.execute_script("envia()")
 
-        sleep_random()
-        driver.execute_script("document.forms[0].submit()")
+sleep_random()
+driver.execute_script("document.forms[0].submit()")
 
-        send_keys_when_ready(driver, (By.NAME, "txtIdCitado"), NIE)
-        sleep_random(1, 2)
+send_keys_when_ready(driver, (By.NAME, "txtIdCitado"), NIE)
+sleep_random(1, 2)
 
-        send_keys_when_ready(driver, (By.NAME, "txtDesCitado"), FULL_NAME)
-        sleep_random()
+send_keys_when_ready(driver, (By.NAME, "txtDesCitado"), FULL_NAME)
+
 
         driver.execute_script("envia()")
 
