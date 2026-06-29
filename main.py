@@ -161,14 +161,14 @@ def save_page_screenshot(driver, prefix: str) -> Path:
 def check_once(bot: Telegram) -> bool:
     driver = make_driver()
 
-    try:
-        print(f"[{now_text()}] Opening site...", flush=True)
+    driver.set_page_load_timeout(180)
 
-        try:
-            driver.get(URL)
-        except TimeoutException:
-            print(f"[{now_text()}] Page load timeout, stopping page load...", flush=True)
-            driver.execute_script("window.stop();")
+try:
+    driver.get(URL)
+except TimeoutException:
+    print(f"[{now_text()}] Page load timeout, waiting for DOM...", flush=True)
+
+sleep_random(15, 10)
 
         for attempt in range(3):
             try:
@@ -176,7 +176,7 @@ def check_once(bot: Telegram) -> bool:
                     driver,
                   (By.TAG_NAME, "select"),  
                     PROVINCE,
-                    timeout=40,
+                    timeout=120,
                 )
                 break
             except TimeoutException:
