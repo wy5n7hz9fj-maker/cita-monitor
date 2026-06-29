@@ -69,6 +69,7 @@ def sleep_random(base_seconds: int = 2, extra_seconds: int = 3) -> None:
 
 def make_driver() -> webdriver.Chrome:
     chrome_options = Options()
+    chrome_options.page_load_strategy = "eager"
 
     if HEADLESS:
         chrome_options.add_argument("--headless=new")
@@ -133,7 +134,11 @@ def check_once(bot: Telegram) -> bool:
     driver = make_driver()
     try:
         print(f"[{now_text()}] Opening site...", flush=True)
-        driver.get(URL)
+       try:
+    driver.get(URL)
+except TimeoutException:
+    print(f"[{now_text()}] Page load timeout, stopping page load...", flush=True)
+    driver.execute_script("window.stop();")
 
         select_by_text_contains(driver, (By.NAME, "form"), PROVINCE)
         sleep_random()
