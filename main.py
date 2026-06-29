@@ -134,11 +134,11 @@ def check_once(bot: Telegram) -> bool:
     driver = make_driver()
     try:
         print(f"[{now_text()}] Opening site...", flush=True)
-       try:
-    driver.get(URL)
-except TimeoutException:
-    print(f"[{now_text()}] Page load timeout, stopping page load...", flush=True)
-    driver.execute_script("window.stop();")
+    try:
+        driver.get(URL)
+    except TimeoutException:
+        print(f"[{now_text()}] Page load timeout, stopping page load...", flush=True)
+        driver.execute_script("window.stop();")
 
         select_by_text_contains(driver, (By.NAME, "form"), PROVINCE)
         sleep_random()
