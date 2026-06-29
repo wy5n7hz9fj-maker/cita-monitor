@@ -132,7 +132,8 @@ def save_page_screenshot(driver, prefix: str) -> Path:
 
 def check_once(bot: Telegram) -> bool:
     driver = make_driver()
-       print(f"[{now_text()}] Opening site...", flush=True)
+    print(f"[{now_text()}] Opening site...", flush=True)
+    
     try:
         driver.get(URL)
     except TimeoutException:
