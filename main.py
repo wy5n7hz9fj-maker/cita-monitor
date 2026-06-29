@@ -132,7 +132,6 @@ def save_page_screenshot(driver, prefix: str) -> Path:
 
 def check_once(bot: Telegram) -> bool:
     driver = make_driver()
-    try:
         print(f"[{now_text()}] Opening site...", flush=True)
     try:
         driver.get(URL)
