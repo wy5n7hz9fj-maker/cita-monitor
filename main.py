@@ -174,9 +174,9 @@ def check_once(bot: Telegram) -> bool:
             try:
                 select_by_text_contains(
                     driver,
-                    (By.NAME, "form"),
+                  (By.TAG_NAME, "select"),  
                     PROVINCE,
-                    timeout=30,
+                    timeout=40,
                 )
                 break
             except TimeoutException:
