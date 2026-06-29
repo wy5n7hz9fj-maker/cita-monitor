@@ -220,7 +220,8 @@ def check_once(bot: Telegram) -> bool:
 def main() -> None:
     bot = Telegram(TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID)
     bot.send_message("✅ Cita monitor iniciado en Railway.")
-    print(f"[{now_text()}] Monitor started.", flush=True)
+    bot.send_message("🟢 TEST: Telegram подключён.")
+    print(f"[{now_text()}] Monitor started.", flush=True)   
 
     next_heartbeat = datetime.now() + timedelta(hours=HEARTBEAT_EVERY_HOURS)
 
