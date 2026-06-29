@@ -201,15 +201,9 @@ def check_once(bot: Telegram) -> bool:
 
     finally:
         driver.quit()
-        )
-        bot.send_message(message)
-        bot.send_photo(screenshot, "Captura de la posible cita")
-        print(f"[{now_text()}] Possible appointment found!", flush=True)
-        return True
 
     finally:
         driver.quit()
-
 
 def main() -> None:
     bot = Telegram(TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID)
