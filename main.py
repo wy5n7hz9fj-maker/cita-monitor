@@ -224,15 +224,15 @@ sleep_random(4, 4)
 page_text = driver.find_element(By.TAG_NAME, "body").text
 screenshot = save_page_screenshot(driver, "check")
 
-        no_slots_phrases = [
-            "En este momento no hay citas disponibles",
-            "no hay citas disponibles",
-            "no existen citas disponibles",
-        ]
+no_slots_phrases = [
+    "En este momento no hay citas disponibles",
+    "no hay citas disponibles",
+    "no existen citas disponibles",
+]
 
-        if any(phrase.lower() in page_text.lower() for phrase in no_slots_phrases):
-            print(f"[{now_text()}] No appointment slots available.", flush=True)
-            return False
+if any(phrase.lower() in page_text.lower() for phrase in no_slots_phrases):
+        print(f"[{now_text()}] No appointment slots available.", flush=True)
+        return False
 
         message = (
             "🚨 POSIBLE CITA ENCONTRADA\n\n"
