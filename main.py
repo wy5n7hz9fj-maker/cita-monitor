@@ -114,8 +114,8 @@ def make_driver() -> webdriver.Chrome:
 
     service = Service(chromedriver_bin)
     driver = webdriver.Chrome(service=service, options=chrome_options)
-    driver.set_page_load_timeout(90)
-    driver.set_script_timeout(90)
+    driver.set_page_load_timeout(180)
+    driver.set_script_timeout(180)
     return driver
 
 
@@ -170,7 +170,7 @@ except TimeoutException:
 
 sleep_random(15, 10)
 
-        for attempt in range(3):
+for attempt in range(3):
             try:
                 select_by_text_contains(
                     driver,
