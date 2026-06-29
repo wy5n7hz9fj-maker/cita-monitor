@@ -132,15 +132,25 @@ def save_page_screenshot(driver, prefix: str) -> Path:
 
 def check_once(bot: Telegram) -> bool:
     driver = make_driver()
-    print(f"[{now_text()}] Opening site...", flush=True)
-    
-    try:
-        driver.get(URL)
-    except TimeoutException:
-        print(f"[{now_text()}] Page load timeout, stopping page load...", flush=True)
-        driver.execute_script("window.stop();")
 
-        select_by_text_contains(driver, (By.NAME, "form"), PROVINCE)
+    try:
+        print(f"[{now_text()}] Opening site...", flush=True)
+
+        try:
+            driver.get(URL)
+        except TimeoutException:
+            print(f"[{now_text()}] Page load timeout, stopping page load...", flush=True)
+            driver.execute_script("window.stop();")
+
+        try:
+            select_by_text_contains(driver, (By.NAME, "form"), PROVINCE, timeout=15)
+        except TimeoutException:
+            screenshot = save_page_screenshot(driver, "first_page_timeout")
+            bot.send_message("⚠️ Сайт открылся, но форма выбора провинции не загрузилась. Отправляю скрин.")
+            bot.send_photo(screenshot, "Первая страница не загрузила форму")
+            print(f"[{now_text()}] Province form not found.", flush=True)
+            return False
+
         sleep_random()
         click_when_ready(driver, (By.ID, "btnAceptar"))
 
@@ -183,6 +193,14 @@ def check_once(bot: Telegram) -> bool:
             f"Trámite: {PROCEDURE}\n"
             f"Hora: {now_text()}\n\n"
             "Revisa la web inmediatamente. Te envío captura."
+        )
+        bot.send_message(message)
+        bot.send_photo(screenshot, "Captura de la posible cita")
+        print(f"[{now_text()}] Possible appointment found!", flush=True)
+        return True
+
+    finally:
+        driver.quit()
         )
         bot.send_message(message)
         bot.send_photo(screenshot, "Captura de la posible cita")
