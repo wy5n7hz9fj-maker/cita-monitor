@@ -171,32 +171,29 @@ except TimeoutException:
 sleep_random(15, 10)
 
 for attempt in range(3):
-            try:
-                select_by_text_contains(
-                    driver,
-                  (By.TAG_NAME, "select"),  
-                    PROVINCE,
-                    timeout=120,
-                )
-                break
-            except TimeoutException:
-                print(
-                    f"[{now_text()}] Province form not found, retry {attempt + 1}/3...",
-                    flush=True,
-                )
-                driver.refresh()
-                sleep_random(8, 5)
-        else:
-            screenshot = save_page_screenshot(driver, "first_page_timeout")
-            bot.send_message(
-                "⚠️ Сайт открылся, но форма выбора провинции не загрузилась. Отправляю скрин."
-            )
-            bot.send_photo(screenshot, "Первая страница не загрузила форму")
-            print(f"[{now_text()}] Province form not found.", flush=True)
-            return False
-
-        sleep_random()
-        click_when_ready(driver, (By.ID, "btnAceptar"))
+    try:
+        select_by_text_contains(
+            driver,
+            (By.TAG_NAME, "select"),
+            PROVINCE,
+            timeout=120,
+        )
+        break
+    except TimeoutException:
+        print(
+            f"[{now_text()}] Province form not found, retry {attempt + 1}/3...",
+            flush=True,
+        )
+        driver.refresh()
+        sleep_random(8, 5)
+else:
+    screenshot = save_page_screenshot(driver, "first_page_timeout")
+    bot.send_message("⚠️ Сайт открылся, но форма выбора провинции не загрузилась. Отправляю скрин.")
+    bot.send_photo(screenshot, "Первая страница не загрузила форму")
+    print(f"[{now_text()}] Province form not found.", flush=True)
+    return False
+sleep_random()
+click_when_ready(driver, (By.ID, "btnAceptar"))
 
         select_by_text_contains(driver, (By.NAME, "sede"), OFFICE)
         sleep_random(1, 2)
