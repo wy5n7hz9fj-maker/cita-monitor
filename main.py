@@ -1,6 +1,7 @@
 import os
 import random
 import time
+import traceback
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -273,8 +274,14 @@ def main() -> None:
         except TimeoutException as exc:
             print(f"[{now_text()}] Timeout error: {exc}", flush=True)
 
-        except WebDriverException as exc:
-            print(f"[{now_text()}] WebDriver error: {exc}", flush=True)
+
+except WebDriverException as exc:
+    print("=" * 80, flush=True)
+    print(type(exc), flush=True)
+    print(repr(exc), flush=True)
+    print(str(exc), flush=True)
+    traceback.print_exc()
+    print("=" * 80, flush=True)
 
         except Exception as exc:
             print(f"[{now_text()}] Unexpected error: {exc}", flush=True)
