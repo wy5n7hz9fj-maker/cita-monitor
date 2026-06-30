@@ -160,79 +160,78 @@ def save_page_screenshot(driver, prefix: str) -> Path:
 
 def check_once(bot: Telegram) -> bool:
     driver = make_driver()
-
     driver.set_page_load_timeout(180)
 
-try:
-    driver.get(URL)
-except TimeoutException:
-    print(f"[{now_text()}] Page load timeout, waiting for DOM...", flush=True)
-
-sleep_random(15, 10)
-
-for attempt in range(3):
     try:
-        select_by_text_contains(
-            driver,
-            (By.TAG_NAME, "select"),
-            PROVINCE,
-            timeout=120,
-        )
-        break
-    except TimeoutException:
-        print(
-            f"[{now_text()}] Province form not found, retry {attempt + 1}/3...",
-            flush=True,
-        )
-        driver.refresh()
-        sleep_random(8, 5)
-        
-    else:
-        screenshot = save_page_screenshot(driver, "first_page_timeout")
-        bot.send_message("⚠️ Сайт открылся, но форма выбора провинции не загрузилась. Отправляю скрин.")
-        bot.send_photo(screenshot, "Первая страница не загрузила форму")
-        print(f"[{now_text()}] Province form not found.", flush=True)
-        return False
+        try:
+            driver.get(URL)
+        except TimeoutException:
+            print(f"[{now_text()}] Page load timeout, waiting for DOM...", flush=True)
 
-sleep_random()
-click_when_ready(driver, (By.ID, "btnAceptar"))
+        sleep_random(15, 10)
 
-select_by_text_contains(driver, (By.NAME, "sede"), OFFICE)
-sleep_random(1, 2)
+        for attempt in range(3):
+            try:
+                select_by_text_contains(
+                    driver,
+                    (By.TAG_NAME, "select"),
+                    PROVINCE,
+                    timeout=120,
+                )
+                break
+            except TimeoutException:
+                print(
+                    f"[{now_text()}] Province form not found, retry {attempt + 1}/3...",
+                    flush=True,
+                )
+                driver.refresh()
+                sleep_random(8, 5)
+        else:
+            screenshot = save_page_screenshot(driver, "first_page_timeout")
+            bot.send_message("⚠️ Сайт открылся, но форма выбора провинции не загрузилась. Отправляю скрин.")
+            bot.send_photo(screenshot, "Первая страница не загрузила форму")
+            print(f"[{now_text()}] Province form not found.", flush=True)
+            return False
 
-select_by_text_contains(driver, (By.NAME, "tramiteGrupo[0]"), PROCEDURE)
-sleep_random()
+        sleep_random()
+        click_when_ready(driver, (By.ID, "btnAceptar"))
 
-driver.execute_script("envia()")
+        select_by_text_contains(driver, (By.NAME, "sede"), OFFICE)
+        sleep_random(1, 2)
 
-sleep_random()
-driver.execute_script("document.forms[0].submit()")
+        select_by_text_contains(driver, (By.NAME, "tramiteGrupo[0]"), PROCEDURE)
+        sleep_random()
 
-send_keys_when_ready(driver, (By.NAME, "txtIdCitado"), NIE)
-sleep_random(1, 2)
+        driver.execute_script("envia()")
 
-send_keys_when_ready(driver, (By.NAME, "txtDesCitado"), FULL_NAME)
-sleep_random()
+        sleep_random()
+        driver.execute_script("document.forms[0].submit()")
 
-driver.execute_script("envia()")
+        send_keys_when_ready(driver, (By.NAME, "txtIdCitado"), NIE)
+        sleep_random(1, 2)
 
-sleep_random()
-driver.execute_script("enviar('solicitud')")
+        send_keys_when_ready(driver, (By.NAME, "txtDesCitado"), FULL_NAME)
+        sleep_random()
 
-sleep_random(4, 4)
+        driver.execute_script("envia()")
 
-page_text = driver.find_element(By.TAG_NAME, "body").text
-screenshot = save_page_screenshot(driver, "check")
+        sleep_random()
+        driver.execute_script("enviar('solicitud')")
 
-no_slots_phrases = [
-    "En este momento no hay citas disponibles",
-    "no hay citas disponibles",
-    "no existen citas disponibles",
-]
+        sleep_random(4, 4)
 
-if any(phrase.lower() in page_text.lower() for phrase in no_slots_phrases):
-        print(f"[{now_text()}] No appointment slots available.", flush=True)
-        return False
+        page_text = driver.find_element(By.TAG_NAME, "body").text
+        screenshot = save_page_screenshot(driver, "check")
+
+        no_slots_phrases = [
+            "En este momento no hay citas disponibles",
+            "no hay citas disponibles",
+            "no existen citas disponibles",
+        ]
+
+        if any(phrase.lower() in page_text.lower() for phrase in no_slots_phrases):
+            print(f"[{now_text()}] No appointment slots available.", flush=True)
+            return False
 
         message = (
             "🚨 POSIBLE CITA ENCONTRADA\n\n"
@@ -250,7 +249,6 @@ if any(phrase.lower() in page_text.lower() for phrase in no_slots_phrases):
 
     finally:
         driver.quit()
-
 
 def main() -> None:
     bot = Telegram(TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID)
