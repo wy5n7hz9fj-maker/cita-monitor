@@ -163,8 +163,7 @@ def check_once(bot: Telegram) -> bool:
     driver.set_page_load_timeout(180)
 
     try:
-        try:
-            for attempt in range(3):
+        for attempt in range(3):
     try:
         driver.get(URL)
         break
