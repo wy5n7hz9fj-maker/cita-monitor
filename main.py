@@ -177,7 +177,7 @@ try:
 except TimeoutException:
     print(f"[{now_text()}] Page load timeout, waiting for DOM...", flush=True)
 
-        sleep_random(15, 10)
+    sleep_random(15, 10)
 
         for attempt in range(3):
             try:
