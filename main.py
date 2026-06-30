@@ -161,20 +161,21 @@ def save_page_screenshot(driver, prefix: str) -> Path:
 def check_once(bot: Telegram) -> bool:
     driver = make_driver()
     driver.set_page_load_timeout(180)
+    
+try:
+    for attempt in range(3):
+        try:
+            driver.get(URL)
+            break
+        except WebDriverException as exc:
+            print(f"[{now_text()}] Попытка {attempt + 1}/3 не удалась: {exc}", flush=True)
+            time.sleep(15)
+    else:
+        print(f"[{now_text()}] Сайт недоступен. Пропускаем цикл.", flush=True)
+        return False
 
-    try:
-        for attempt in range(3):
-    try:
-        driver.get(URL)
-        break
-    except WebDriverException as exc:
-        print(f"[{now_text()}] Попытка {attempt + 1}/3 не удалась: {exc}", flush=True)
-        time.sleep(15)
-else:
-    print(f"[{now_text()}] Сайт недоступен. Пропускаем цикл.", flush=True)
-    return False
-        except TimeoutException:
-            print(f"[{now_text()}] Page load timeout, waiting for DOM...", flush=True)
+except TimeoutException:
+    print(f"[{now_text()}] Page load timeout, waiting for DOM...", flush=True)
 
         sleep_random(15, 10)
 
