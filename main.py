@@ -179,7 +179,7 @@ except TimeoutException:
 
     sleep_random(15, 10)
 
-        for attempt in range(3):
+    for attempt in range(3):
             try:
                 select_by_text_contains(
                     driver,
