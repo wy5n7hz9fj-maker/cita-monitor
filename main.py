@@ -164,7 +164,16 @@ def check_once(bot: Telegram) -> bool:
 
     try:
         try:
-            driver.get(URL)
+            for attempt in range(3):
+    try:
+        driver.get(URL)
+        break
+    except WebDriverException as exc:
+        print(f"[{now_text()}] Попытка {attempt + 1}/3 не удалась: {exc}", flush=True)
+        time.sleep(15)
+else:
+    print(f"[{now_text()}] Сайт недоступен. Пропускаем цикл.", flush=True)
+    return False
         except TimeoutException:
             print(f"[{now_text()}] Page load timeout, waiting for DOM...", flush=True)
 
