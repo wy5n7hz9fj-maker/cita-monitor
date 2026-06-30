@@ -195,7 +195,7 @@ except TimeoutException:
                 )
                 driver.refresh()
                 sleep_random(8, 5)
-        else:
+    else:
             screenshot = save_page_screenshot(driver, "first_page_timeout")
             bot.send_message("⚠️ Сайт открылся, но форма выбора провинции не загрузилась. Отправляю скрин.")
             bot.send_photo(screenshot, "Первая страница не загрузила форму")
